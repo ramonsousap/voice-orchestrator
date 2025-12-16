@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  orchestrator:
+    build: .
+    container_name: voice-orchestrator
+    ports:
+      - "8000:8000"
+    volumes:
+      - /tank/dados/llm-voip/orchestrator/audio:/audio
+    depends_on:
+      - whisper
+      - ollama
+      - tts
+
+  whisper:
+    container_name: whisper
+    image: whisper-stt-whisper:latest
+    ports:
+      - "10300:10300"
+
+  ollama:
+    container_name: ollama
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - /tank/ollama:/root/.ollama
+
+  tts:
+    container_name: tts
+    image: tts-xtts-tts:latest
+    ports:
+      - "5002:5002"
+    volumes:
+      - /tank/dados/llm-voip/tts/output:/output
