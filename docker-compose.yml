@@ -7,6 +7,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - /tank/dados/llm-voip/tts/output:/tts-output
       - /tank/dados/llm-voip/orchestrator/audio:/audio
     networks:
       - llm-voip
