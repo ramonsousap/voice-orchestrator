@@ -4,7 +4,7 @@ import uuid
 import os
 import shutil
 
-WHISPER_URL = "http://172.19.0.2:10300/transcribe"
+WHISPER_URL = "http://whisper-stt:10300/transcribe"
 OLLAMA_URL  = "http://ollama:11434/api/generate"
 TTS_URL     = "http://tts:5002/tts"
 
