@@ -1,11 +1,16 @@
 version: "3.9"
 
 services:
-  orchestrator:
+  voice-orchestrator:
     build: .
     container_name: voice-orchestrator
     ports:
       - "8000:8000"
     volumes:
       - /tank/dados/llm-voip/orchestrator/audio:/audio
+    networks:
+      - llm-voip
 
+networks:
+  llm-voip:
+    external: true

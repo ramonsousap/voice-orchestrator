@@ -61,28 +61,31 @@ async def process_audio(file: UploadFile = File(...)):
     if not text_out:
         raise HTTPException(500, "Empty LLM response")
 
-    # 3) TTS (XTTS – WAV direto)
-    tts_resp = requests.get(
+    # 3) TTS (XTTS - file based)
+tts_resp = requests.get(
     TTS_URL,
     params={
         "text": text_out,
         "speaker": "default",
         "language": "pt-br"
-    },
-    headers={
-        "Accept": "audio/wav"
-    },
-    stream=True
-    )
+    }
+)
 
-    if tts_resp.status_code != 200:
+if tts_resp.status_code != 200:
     raise HTTPException(500, f"TTS failed: {tts_resp.text}")
 
-    final_path = f"{AUDIO_OUT}/{audio_id}.wav"
+tts_file = tts_resp.json().get("file")
+if not tts_file:
+    raise HTTPException(500, "XTTS did not return file path")
 
-    with open(final_path, "wb") as f:
-    for chunk in tts_resp.iter_content(chunk_size=8192):
-        if chunk:
-            f.write(chunk)
+# Ex: /output/uuid.wav  →  /tts-output/uuid.wav
+filename = os.path.basename(tts_file)
+source_path = f"/tts-output/{filename}"
 
+final_path = f"{AUDIO_OUT}/{audio_id}.wav"
+
+if not os.path.exists(source_path):
+    raise HTTPException(500, "Generated WAV not found")
+
+shutil.copy(source_path, final_path)
 
