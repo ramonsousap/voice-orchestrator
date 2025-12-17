@@ -4,9 +4,9 @@ import uuid
 import os
 import shutil
 
-STT_URL = "http://192.168.0.205:10300/transcribe"
-LLM_URL = "http://192.168.0.205:11434/api/generate"
-TTS_URL = "http://192.168.0.205:5002/tts"
+WHISPER_URL = "http://whisper-stt:10300/transcribe"
+OLLAMA_URL  = "http://ollama:11434/api/generate"
+TTS_URL     = "http://tts:5002/tts"
 
 
 AUDIO_IN = "/audio/in"
