@@ -6,7 +6,7 @@ import json
 
 WHISPER_URL = "http://whisper-stt:10300/transcribe"
 OLLAMA_URL  = "http://ollama:11434/api/generate"
-TTS_URL     = "http://tts:5002/tts"
+TTS_URL = "http://tts:5002/api/tts"
 
 AUDIO_IN = "/audio/in"
 AUDIO_OUT = "/audio/out"
@@ -61,25 +61,28 @@ async def process_audio(file: UploadFile = File(...)):
     if not text_out:
         raise HTTPException(500, "Empty LLM response")
 
-    # 3) TTS (XTTS – streaming WAV)
+    # 3) TTS (XTTS – WAV direto)
     tts_resp = requests.get(
-        TTS_URL,
-        params={"text": text_out},
-        stream=True
+    TTS_URL,
+    params={
+        "text": text_out,
+        "speaker": "default",
+        "language": "pt-br"
+    },
+    headers={
+        "Accept": "audio/wav"
+    },
+    stream=True
     )
 
     if tts_resp.status_code != 200:
-        raise HTTPException(500, "TTS failed")
+    raise HTTPException(500, f"TTS failed: {tts_resp.text}")
 
     final_path = f"{AUDIO_OUT}/{audio_id}.wav"
-    with open(final_path, "wb") as f:
-        for chunk in tts_resp.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
 
-    return {
-        "transcription": text_in,
-        "response": text_out,
-        "audio": final_path
-    }
+    with open(final_path, "wb") as f:
+    for chunk in tts_resp.iter_content(chunk_size=8192):
+        if chunk:
+            f.write(chunk)
+
 
